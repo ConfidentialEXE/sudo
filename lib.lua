@@ -642,46 +642,6 @@ local RayfieldLibrary = {
 			InputStroke = Color3.fromRGB(180, 190, 200),
 			PlaceholderColor = Color3.fromRGB(150, 150, 150)
 		},
-		Aids = {
-			TextColor = Color3.fromRGB(255, 0, 0),
-			Background = Color3.fromRGB(0, 0, 0),
-			Topbar = Color3.fromRGB(100, 255, 235),
-			Shadow = Color3.fromRGB(0, 210, 0),
-
-			NotificationBackground = Color3.fromRGB(210, 220, 230),
-			NotificationActionsBackground = Color3.fromRGB(225, 230, 240),
-
-			TabBackground = Color3.fromRGB(200, 210, 220),
-			TabStroke = Color3.fromRGB(180, 190, 200),
-			TabBackgroundSelected = Color3.fromRGB(175, 185, 200),
-			TabTextColor = Color3.fromRGB(50, 55, 60),
-			SelectedTabTextColor = Color3.fromRGB(30, 35, 40),
-
-			ElementBackground = Color3.fromRGB(210, 220, 230),
-			ElementBackgroundHover = Color3.fromRGB(220, 230, 240),
-			SecondaryElementBackground = Color3.fromRGB(200, 210, 220),
-			ElementStroke = Color3.fromRGB(190, 200, 210),
-			SecondaryElementStroke = Color3.fromRGB(180, 190, 200),
-
-			SliderBackground = Color3.fromRGB(200, 220, 235),  -- Lighter shade
-			SliderProgress = Color3.fromRGB(70, 130, 180),
-			SliderStroke = Color3.fromRGB(150, 180, 220),
-
-			ToggleBackground = Color3.fromRGB(210, 220, 230),
-			ToggleEnabled = Color3.fromRGB(70, 160, 210),
-			ToggleDisabled = Color3.fromRGB(180, 180, 180),
-			ToggleEnabledStroke = Color3.fromRGB(60, 150, 200),
-			ToggleDisabledStroke = Color3.fromRGB(140, 140, 140),
-			ToggleEnabledOuterStroke = Color3.fromRGB(100, 120, 140),
-			ToggleDisabledOuterStroke = Color3.fromRGB(120, 120, 130),
-
-			DropdownSelected = Color3.fromRGB(220, 230, 240),
-			DropdownUnselected = Color3.fromRGB(200, 210, 220),
-
-			InputBackground = Color3.fromRGB(220, 230, 240),
-			InputStroke = Color3.fromRGB(180, 190, 200),
-			PlaceholderColor = Color3.fromRGB(150, 150, 150)
-		},
 	}
 }
 
@@ -2018,22 +1978,11 @@ function RayfieldLibrary:CreateWindow(Settings)
 	local Window = {}
 	function Window:CreateTab(Name, Image, Ext)
 		local SDone = false
-
-		-- Normalise Name
-		if type(Name) ~= "string" then
-			Name = ""
-		end
-
-		-- Check if Name contains at least one non-space character
-		local hasText = Name:match("%S") ~= nil
-
 		local TabButton = TabList.Template:Clone()
-		TabButton.Name = hasText and Name or "Tab"
+		TabButton.Name = Name
+		TabButton.Title.Text = Name
 		TabButton.Parent = TabList
-
 		TabButton.Title.TextWrapped = false
-		TabButton.Title.Text = hasText and Name or ""
-		
 		TabButton.Size = UDim2.new(0, TabButton.Title.TextBounds.X + 30, 0, 30)
 
 		if Image and Image ~= 0 then
@@ -2054,10 +2003,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			TabButton.Size = UDim2.new(0, TabButton.Title.TextBounds.X + 52, 0, 30)
 		end
 
-		if not hasText and not Image or Image == 0 then
-			TabButton.Title.Text = "A Tab"
-			RayfieldLibrary:Notify({Title = 'Incomplete Tab', Content = 'An un-named & no icon Tab was created', Image = 4400704299})
-		end
+
 
 		TabButton.BackgroundTransparency = 1
 		TabButton.Title.TextTransparency = 1
@@ -4050,4 +3996,3 @@ task.delay(4, function()
 end)
 
 return RayfieldLibrary
-
