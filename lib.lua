@@ -2004,8 +2004,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			if hasText then
 				TabButton.Size = UDim2.new(0, TabButton.Title.TextBounds.X + 52, 0, 30)
 			else
-				TabButton.Title.AnchorPoint = Vector2.new(0, 0)
-				TabButton.Title.Position = UDim2.new(0, 0, 0, 0)
+				TabButton.Image.Position = UDim2.new(0, 0, 0, 0)
 			end
 		end
 
