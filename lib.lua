@@ -2018,32 +2018,70 @@ function RayfieldLibrary:CreateWindow(Settings)
 	local Window = {}
 	function Window:CreateTab(Name, Image, Ext)
 		local SDone = false
+
+		-- Normalise Name
+		if type(Name) ~= "string" then
+			Name = ""
+		end
+
+		local hasText = Name:match("%S") ~= nil
+		local hasImage = Image ~= nil and Image ~= 0
+
+		-- Fallback icon (MUST exist)
+		local FALLBACK_ICON = "rbxassetid://123456789" -- change to your default
+
 		local TabButton = TabList.Template:Clone()
-		TabButton.Name = Name
-		TabButton.Title.Text = Name
 		TabButton.Parent = TabList
+
 		TabButton.Title.TextWrapped = false
-		TabButton.Size = UDim2.new(0, TabButton.Title.TextBounds.X + 30, 0, 30)
+		TabButton.Title.Text = hasText and Name or ""
 
-		if Image and Image ~= 0 then
-			if typeof(Image) == 'string' and Icons then
+		TabButton.Name = hasText and Name or "Tab"
+
+		-- Layout constants
+		local HEIGHT = 30
+		local BASE_PADDING = 12
+		local ICON_WIDTH = 24
+		local ICON_PADDING = 10
+		local TEXT_PADDING = 6
+
+		local width = BASE_PADDING * 2
+
+		-- ─── ICON HANDLING ──────────────────────────────
+		if hasImage then
+			if typeof(Image) == "string" and Icons then
 				local asset = getIcon(Image)
-
-				TabButton.Image.Image = 'rbxassetid://'..asset.id
+				TabButton.Image.Image = "rbxassetid://" .. asset.id
 				TabButton.Image.ImageRectOffset = asset.imageRectOffset
 				TabButton.Image.ImageRectSize = asset.imageRectSize
 			else
 				TabButton.Image.Image = getAssetUri(Image)
 			end
+		else
+			-- Fallback icon if NO text and NO image
+			if not hasText then
+				TabButton.Image.Image = FALLBACK_ICON
+				hasImage = true
+			end
+		end
+
+		TabButton.Image.Visible = hasImage
+
+		if hasImage then
+			width += ICON_WIDTH + ICON_PADDING
 
 			TabButton.Title.AnchorPoint = Vector2.new(0, 0.5)
 			TabButton.Title.Position = UDim2.new(0, 37, 0.5, 0)
-			TabButton.Image.Visible = true
 			TabButton.Title.TextXAlignment = Enum.TextXAlignment.Left
-			TabButton.Size = UDim2.new(0, TabButton.Title.TextBounds.X + 52, 0, 30)
 		end
 
+		-- ─── TEXT HANDLING ──────────────────────────────
+		if hasText then
+			width += TabButton.Title.TextBounds.X + TEXT_PADDING
+		end
 
+		-- ─── FINAL SIZE ─────────────────────────────────
+		TabButton.Size = UDim2.new(0, width, 0, HEIGHT)
 
 		TabButton.BackgroundTransparency = 1
 		TabButton.Title.TextTransparency = 1
