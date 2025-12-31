@@ -2033,6 +2033,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 		TabButton.Title.TextWrapped = false
 		TabButton.Title.Text = hasText and Name or ""
+		
+		TabButton.Size = UDim2.new(0, TabButton.Title.TextBounds.X + 30, 0, 30)
 
 		if Image and Image ~= 0 then
 			if typeof(Image) == 'string' and Icons then
