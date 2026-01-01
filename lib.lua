@@ -799,6 +799,8 @@ local function ChangeTheme(Theme)
 			end
 		end
 	end
+
+	UpdateHoverGradientTheme(SelectedTheme)
 end
 
 local function getIcon(name : string): {id: number, imageRectSize: Vector2, imageRectOffset: Vector2}
@@ -843,6 +845,121 @@ local function getAssetUri(id: any): string
 	end
 	return assetUri
 end
+
+-- UIStroke Hover Effect System
+-- Add this after the Main variable initialization (around line 650)
+
+-- Create the hover stroke template as a child of Rayfield.Main
+local HoverStrokeTemplate = Instance.new("UIStroke")
+HoverStrokeTemplate.Name = "HoverStroke"
+HoverStrokeTemplate.Enabled = false -- Hidden by default
+HoverStrokeTemplate.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+HoverStrokeTemplate.Thickness = 2
+HoverStrokeTemplate.Transparency = 0
+
+-- Create UIGradient as child of UIStroke
+local HoverGradient = Instance.new("UIGradient")
+HoverGradient.Name = "HoverGradient"
+HoverGradient.Parent = HoverStrokeTemplate
+
+-- Color sequence will be set based on theme
+HoverGradient.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 200, 255)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(150, 100, 255)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 200, 255))
+}
+
+-- Store template as child of Main
+HoverStrokeTemplate.Parent = Main
+
+-- Function to add hover stroke to an element
+local function AddHoverStroke(element)
+	if not element or element.Name == "SectionSpacing" or element.Name == "Placeholder" 
+		or element.Name == "SectionTitle" or element.Name == "Divider" 
+		or element.Name == "SearchTitle-fsefsefesfsefesfesfThanks" then
+		return
+	end
+	
+	-- Clone the hover stroke for this element
+	local hoverStroke = HoverStrokeTemplate:Clone()
+	hoverStroke.Name = "HoverStroke"
+	hoverStroke.Parent = element
+	hoverStroke.Enabled = false -- Start hidden
+	
+	-- Get or create Interact button for hover detection
+	local interact = element:FindFirstChild("Interact")
+	if interact then
+		interact.MouseEnter:Connect(function()
+			if not Hidden and not Minimised then
+				hoverStroke.Enabled = true
+				-- Animate stroke appearance
+				hoverStroke.Transparency = 1
+				TweenService:Create(hoverStroke, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {
+					Transparency = 0
+				}):Play()
+			end
+		end)
+		
+		interact.MouseLeave:Connect(function()
+			-- Animate stroke disappearance
+			TweenService:Create(hoverStroke, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {
+				Transparency = 1
+			}):Play()
+			task.wait(0.2)
+			hoverStroke.Enabled = false
+		end)
+	end
+end
+
+-- Function to update hover gradient colors based on theme
+local function UpdateHoverGradientTheme(theme)
+	-- Update the template
+	local gradient = HoverStrokeTemplate:FindFirstChild("HoverGradient")
+	if gradient then
+		-- Create gradient based on theme's ElementBackgroundHover color
+		local baseColor = theme.ElementBackgroundHover or Color3.fromRGB(100, 200, 255)
+		local lighterColor = Color3.new(
+			math.min(baseColor.R + 0.2, 1),
+			math.min(baseColor.G + 0.2, 1),
+			math.min(baseColor.B + 0.2, 1)
+		)
+		
+		gradient.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0, lighterColor),
+			ColorSequenceKeypoint.new(0.5, baseColor),
+			ColorSequenceKeypoint.new(1, lighterColor)
+		}
+	end
+	
+	-- Update all existing hover strokes
+	for _, descendant in ipairs(Main:GetDescendants()) do
+		if descendant.Name == "HoverStroke" and descendant:IsA("UIStroke") then
+			local grad = descendant:FindFirstChild("HoverGradient")
+			if grad then
+				local baseColor = theme.ElementBackgroundHover or Color3.fromRGB(100, 200, 255)
+				local lighterColor = Color3.new(
+					math.min(baseColor.R + 0.2, 1),
+					math.min(baseColor.G + 0.2, 1),
+					math.min(baseColor.B + 0.2, 1)
+				)
+				
+				grad.Color = ColorSequence.new{
+					ColorSequenceKeypoint.new(0, lighterColor),
+					ColorSequenceKeypoint.new(0.5, baseColor),
+					ColorSequenceKeypoint.new(1, lighterColor)
+				}
+			end
+		end
+	end
+end
+
+-- Modify the ChangeTheme function to include hover gradient updates
+-- Find the ChangeTheme function and add this at the end:
+-- UpdateHoverGradientTheme(SelectedTheme)
+
+-- Example of where to call AddHoverStroke:
+-- When creating UI elements, after the element is created and Interact is added, call:
+-- AddHoverStroke(Element)
 
 local function makeDraggable(object, dragObject, enableTaptic, tapticOffset)
 	local dragging = false
@@ -2163,6 +2280,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 				Button.Name = NewButton
 			end
 
+			AddHoverStroke(Button)
+
 			return ButtonValue
 		end
 
@@ -2417,6 +2536,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 				ColorPicker.HexInput.UIStroke.Color = SelectedTheme.InputStroke
 			end)
 
+			AddHoverStroke(ColorPicker)
+
 			return ColorPickerSettings
 		end
 
@@ -2558,6 +2679,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 				Label.UIStroke.Color = IgnoreTheme and (Color or Label.BackgroundColor3) or SelectedTheme.SecondaryElementStroke
 			end)
 
+			AddHoverStroke(Label)
+
 			return LabelValue
 		end
 
@@ -2593,6 +2716,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 				Paragraph.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
 				Paragraph.UIStroke.Color = SelectedTheme.SecondaryElementStroke
 			end)
+
+			AddHoverStroke(Paragraph)
 
 			return ParagraphValue
 		end
@@ -2683,6 +2808,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 				Input.InputFrame.BackgroundColor3 = SelectedTheme.InputBackground
 				Input.InputFrame.UIStroke.Color = SelectedTheme.InputStroke
 			end)
+
+			AddHoverStroke(Input)
 
 			return InputSettings
 		end
@@ -3002,6 +3129,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 				TweenService:Create(Dropdown, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
 			end)
 
+			AddHoverStroke(Dropdown)
+
 			return DropdownSettings
 		end
 
@@ -3132,6 +3261,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 				Keybind.KeybindFrame.BackgroundColor3 = SelectedTheme.InputBackground
 				Keybind.KeybindFrame.UIStroke.Color = SelectedTheme.InputStroke
 			end)
+
+			AddHoverStroke(Keybind)
 
 			return KeybindSettings
 		end
@@ -3304,6 +3435,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 				end
 			end)
 
+			AddHoverStroke(Toggle)
+
 			return ToggleSettings
 		end
 
@@ -3475,6 +3608,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 				Slider.Main.Progress.UIStroke.Color = SelectedTheme.SliderStroke
 				Slider.Main.Progress.BackgroundColor3 = SelectedTheme.SliderProgress
 			end)
+
+			AddHoverStroke(Slider)
 
 			return SliderSettings
 		end
