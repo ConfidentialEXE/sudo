@@ -1568,10 +1568,12 @@ function RayfieldLibrary:CreateWindow(Settings)
 	if Rayfield:FindFirstChild('Loading') then
 		if getgenv and not getgenv().rayfieldCached then
 			Rayfield.Enabled = true
+			--[[ --Initial Loading Splash
 			Rayfield.Loading.Visible = true
 
 			task.wait(1.4)
 			Rayfield.Loading.Visible = false
+			]]
 		end
 	end
 
@@ -3548,7 +3550,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 		if not success then
 			RayfieldLibrary:Notify({Title = 'Unable to Change Theme', Content = 'We are unable find a theme on file.', Image = 4400704299})
 		else
-			RayfieldLibrary:Notify({Title = 'Theme Changed', Content = 'Successfully changed theme to '..(typeof(NewTheme) == 'string' and NewTheme or 'Custom Theme')..'.', Image = 4483362748})
+			RayfieldLibrary:Notify({Title = 'Theme Changed', Content = 'Successfully changed theme to '..(typeof(NewTheme) == 'string' and NewTheme or 'Custom Theme')..'.', Image = "palette"})
 		end
 	end
 
@@ -3996,4 +3998,3 @@ task.delay(4, function()
 end)
 
 return RayfieldLibrary
-
