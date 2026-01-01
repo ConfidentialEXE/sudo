@@ -1978,7 +1978,6 @@ function RayfieldLibrary:CreateWindow(Settings)
 	local Window = {}
 	function Window:CreateTab(Name, Image, Ext)
 		local SDone = false
-		local hasText = Name:match("%S") ~= nil
 		local TabButton = TabList.Template:Clone()
 		TabButton.Name = Name
 		TabButton.Title.Text = Name
@@ -2001,11 +2000,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			TabButton.Title.Position = UDim2.new(0, 37, 0.5, 0)
 			TabButton.Image.Visible = true
 			TabButton.Title.TextXAlignment = Enum.TextXAlignment.Left
-			if hasText then
-				TabButton.Size = UDim2.new(0, TabButton.Title.TextBounds.X + 52, 0, 30)
-			else
-				TabButton.Image.Position = UDim2.new(0, 0, 0, 0)
-			end
+			TabButton.Size = UDim2.new(0, TabButton.Title.TextBounds.X + 52, 0, 30)
 		end
 
 
@@ -4001,3 +3996,4 @@ task.delay(4, function()
 end)
 
 return RayfieldLibrary
+
